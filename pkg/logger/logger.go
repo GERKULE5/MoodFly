@@ -11,7 +11,7 @@ var (
 )
 
 func Init() {
-	flags := log.Ldate | log.Ltime | log.Lshortfile
+	flags := log.Ldate | log.Ltime | log.Llongfile
 
 	logInfo := log.New(os.Stdout, "INFO: ", flags)
 	logWarn := log.New(os.Stdout, "WARN: ", flags)

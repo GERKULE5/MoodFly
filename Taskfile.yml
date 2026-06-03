@@ -6,9 +6,23 @@ dotenv: ['.env']
 
 
 tasks:
- dev:
-  desc: "Run application"
-  cmds:
-    - docker-compose down -v
-    - docker-compose up -d
-    - go run ./cmd/api/main.go
+  dev:
+    desc: "Run application"
+    cmds:
+      - docker-compose up -d
+      - go run ./cmd/api/main.go
+
+  migrate:up:
+    desc: "Run migrations"
+    cmds:
+      - migrate -path migrations -database "{{.POSTGRES_URL}}" up
+
+  migrate:down:
+    desc: "Cancel last migration"
+    cmds:
+      - migrate -path migrations -database "{{.POSTGRES_URL}}" down 1
+
+  migrate:create:
+    desc: "Create migration"
+    cmds:
+      - migrate create -ext sql -dir migrations -seq {{.CLI_ARGS}}
