@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+dotenv: ['.env']
+
+
+tasks:
+ dev:
+  desc: "Run application"
+  cmds:
+    - docker-compose down -v
+    - docker-compose up -d
+    - go run ./cmd/api/main.go
