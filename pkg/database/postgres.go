@@ -36,13 +36,11 @@ func ConnectDB() (*pgxpool.Pool, error) {
 	db, err := pgxpool.New(context.Background(), dsn)
 	if err != nil {
 		logger.Err("Failed connect to DB: ", err)
-		os.Exit(1)
 	}
 
 	err = db.Ping(context.Background())
 	if err != nil {
 		logger.Err("Unable to Ping DB: ", err)
-		os.Exit(1)
 	}
 
 	logger.Info("Successfully connected to DB")

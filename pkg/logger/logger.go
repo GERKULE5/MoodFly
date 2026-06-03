@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"fmt"
 	"log"
 	"os"
 )
@@ -30,13 +31,13 @@ type loggers struct {
 }
 
 func Info(v ...interface{}) {
-	l.logInfo.Println(v...)
+	l.logInfo.Output(2, fmt.Sprintln(v...))
 }
 
 func Warn(v ...interface{}) {
-	l.logWarn.Println(v...)
+	l.logWarn.Output(2, fmt.Sprintln(v...))
 }
 
 func Err(v ...interface{}) {
-	l.logErr.Println(v...)
+	l.logErr.Output(2, fmt.Sprintln(v...))
 }
