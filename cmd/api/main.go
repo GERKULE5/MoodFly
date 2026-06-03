@@ -2,15 +2,14 @@ package main
 
 import (
 	"MoodFly/pkg/database"
-	"fmt"
+	"MoodFly/pkg/logger"
 )
 
 func main() {
-	fmt.Println("dfdf")
-
+	logger.Init()
 	db, err := database.ConnectDB()
 	if err != nil {
-		fmt.Println("Failed to connect DB")
+		logger.Err("Failed to connect DB")
 	}
 	defer db.Close()
 }

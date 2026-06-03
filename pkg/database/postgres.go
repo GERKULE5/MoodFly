@@ -1,6 +1,7 @@
 package database
 
 import (
+	"MoodFly/pkg/logger"
 	"context"
 	"fmt"
 	"os"
@@ -34,17 +35,17 @@ func ConnectDB() (*pgxpool.Pool, error) {
 
 	db, err := pgxpool.New(context.Background(), dsn)
 	if err != nil {
-		fmt.Println("Failed connect to DB")
+		logger.Err("Failed connect to DB: ", err)
 		os.Exit(1)
 	}
 
 	err = db.Ping(context.Background())
 	if err != nil {
-		fmt.Println("Unable to Ping DB: ", err)
+		logger.Err("Unable to Ping DB: ", err)
 		os.Exit(1)
 	}
 
-	fmt.Print("Successfully connected to DB")
+	logger.Info("Successfully connected to DB")
 	return db, nil
 }
 
