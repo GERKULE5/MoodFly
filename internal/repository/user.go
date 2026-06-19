@@ -1,6 +1,7 @@
 package repository
 
 import (
+	apperror "MoodFly/pkg/error"
 	"MoodFly/pkg/logger"
 	"context"
 	"errors"
@@ -41,7 +42,7 @@ func (r *UserRepository) Create(ctx context.Context, user *User) (*User, error) 
 	err := r.db.QueryRow(ctx, query, user.Username, user.Password, user.PhoneNumber).Scan(&user.ID)
 	if err != nil {
 		logger.Warn(err)
-		return nil, err
+		return nil, apperror.Internal("Internal Server Error", err)
 	}
 
 	return user, nil
@@ -49,12 +50,12 @@ func (r *UserRepository) Create(ctx context.Context, user *User) (*User, error) 
 
 func (r *UserRepository) GetAll(ctx context.Context) ([]User, error) {
 	users := make([]User, 0)
-	query := "SELECT * FROM users"
+	query := "SELECT * FROM users WHERE deleted_at IS NULL"
 
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
 		logger.Warn(err)
-		return users, err
+		return users, apperror.Internal("Internal Server Error", err)
 	}
 	defer rows.Close()
 
@@ -64,7 +65,7 @@ func (r *UserRepository) GetAll(ctx context.Context) ([]User, error) {
 		err := rows.Scan(&user.ID, &user.Username, &user.Password, &user.PhoneNumber, &user.CreatedAt, &user.DeletedAt)
 		if err != nil {
 			logger.Warn(err)
-			return nil, err
+			return nil, apperror.Internal("Internal Server Error", err)
 		}
 
 		users = append(users, user)
@@ -89,10 +90,10 @@ func (r *UserRepository) GetByID(ctx context.Context, id int) (User, error) {
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			logger.Warn(err)
-			return User{}, nil
+			return User{}, apperror.NotFound("User not found")
 		}
 		logger.Warn(err)
-		return User{}, nil
+		return User{}, apperror.Internal("Internal Server Error", err)
 	}
 	return user, nil
 }
@@ -119,10 +120,10 @@ func (r *UserRepository) Update(ctx context.Context, user *User) (*User, error) 
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errors.New("user not found")
+			return nil, apperror.NotFound("User not found")
 		}
 		logger.Warn(err)
-		return nil, err
+		return nil, apperror.Internal("Internal Server Error", err)
 	}
 
 	return user, nil
@@ -134,11 +135,11 @@ func (r *UserRepository) DeleteByID(ctx context.Context, id int) error {
 	result, err := r.db.Exec(ctx, query, id)
 	if err != nil {
 		logger.Warn(err)
-		return err
+		return apperror.Internal("Internal Server Error", err)
 	}
 
 	if result.RowsAffected() == 0 {
-		return errors.New("user not found or already deleted")
+		return apperror.NotFound("User not found")
 	}
 
 	return nil

@@ -3,6 +3,7 @@ package handler
 import (
 	"MoodFly/internal/dto"
 	"MoodFly/internal/service"
+	apperror "MoodFly/pkg/error"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -10,6 +11,11 @@ import (
 
 type UserHandler struct {
 	service service.UserServiceInterface
+}
+
+func handleError(w http.ResponseWriter, err error) {
+	code, msg := apperror.ToHTTP(err)
+	http.Error(w, msg, code)
 }
 
 func NewUserNandler(service service.UserServiceInterface) *UserHandler {
@@ -29,7 +35,7 @@ func (handler *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	user, err := handler.service.Create(r.Context(), &request)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		handleError(w, err)
 		return
 	}
 
@@ -42,7 +48,7 @@ func (handler *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 func (handler *UserHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	users, err := handler.service.GetAll(r.Context())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		handleError(w, err)
 		return
 	}
 
@@ -61,7 +67,7 @@ func (handler *UserHandler) GetUserByID(w http.ResponseWriter, r *http.Request) 
 
 	user, err := handler.service.GetByID(r.Context(), id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		handleError(w, err)
 		return
 	}
 
@@ -88,7 +94,7 @@ func (handler *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	user, err := handler.service.Update(r.Context(), id, &request)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		handleError(w, err)
 		return
 	}
 
@@ -107,7 +113,7 @@ func (handler *UserHandler) DeleteUserByID(w http.ResponseWriter, r *http.Reques
 
 	err = handler.service.DeleteByID(r.Context(), id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		handleError(w, err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
