@@ -26,6 +26,9 @@ func main() {
 
 	mux.HandleFunc("GET /ping", handler.Ping)
 	mux.HandleFunc("POST /users", userHandler.CreateUser)
+	mux.HandleFunc("GET /users", userHandler.GetAllUsers)
+	mux.HandleFunc("GET /users/{id}", userHandler.GetUserByID)
+	mux.HandleFunc("DELETE /users/{id}", userHandler.DeleteUserByID)
 
 	logger.Info("Server started on 3000")
 	err = http.ListenAndServe(":3000", mux)
