@@ -129,16 +129,17 @@ func (r *UserRepository) Update(ctx context.Context, user *User) (*User, error) 
 }
 
 func (r *UserRepository) DeleteByID(ctx context.Context, id int) error {
-	query := "DELETE FROM users WHERE id=$1"
+	query := "UPDATE users SET deleted_at = NOW() WHERE id = $1 AND deleted_at IS NULL"
 
-	_, err := r.db.Exec(ctx, query, id)
+	result, err := r.db.Exec(ctx, query, id)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			logger.Warn(err)
-			return err
-		}
 		logger.Warn(err)
 		return err
 	}
+
+	if result.RowsAffected() == 0 {
+		return errors.New("user not found or already deleted")
+	}
+
 	return nil
 }
