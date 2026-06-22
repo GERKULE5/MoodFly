@@ -1,0 +1,10 @@
+CREATE TABLE aircrafts (
+  id SERIAL NOT NULL PRIMARY KEY,
+  win_num VARCHAR(12) UNIQUE NOT NULL,
+  model VARCHAR(100) NOT NULL,
+  capacity INTEGER NOT NULL,
+  carrying_kg INTEGER NOT NULL,
+  flight_time INTEGER NOT NULL,
+  released_at TIMESTAMPTZ NOT NULL,
+  licensed_at TIMESTAMPTZ NOT NULL
+)

@@ -37,6 +37,14 @@ func Internal(message string, err error) *AppError {
 	}
 }
 
+func Conflict(message string, err error) *AppError {
+	return &AppError{
+		Code:    http.StatusConflict,
+		Message: message,
+		Err:     err,
+	}
+}
+
 func ToHTTP(err error) (int, string) {
 	var appError *AppError
 	if errors.As(err, &appError) {

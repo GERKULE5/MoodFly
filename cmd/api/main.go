@@ -24,12 +24,23 @@ func main() {
 	userService := service.NewUserService(userRepo)
 	userHandler := handler.NewUserNandler(userService)
 
+	aircraftRepo := repository.NewAircraftRepository(db)
+	aircraftService := service.NewAircraftService(aircraftRepo)
+	aircraftHandler := handler.NewAircraftHandler(aircraftService)
+
 	mux.HandleFunc("GET /ping", handler.Ping)
+
 	mux.HandleFunc("POST /users", userHandler.CreateUser)
 	mux.HandleFunc("GET /users", userHandler.GetAllUsers)
 	mux.HandleFunc("GET /users/{id}", userHandler.GetUserByID)
 	mux.HandleFunc("PUT /users/{id}", userHandler.UpdateUser)
 	mux.HandleFunc("DELETE /users/{id}", userHandler.DeleteUserByID)
+
+	mux.HandleFunc("POST /aircrafts", aircraftHandler.CreateAircraft)
+	mux.HandleFunc("GET /aircrafts", aircraftHandler.GetAllAircrafts)
+	mux.HandleFunc("GET /aircrafts/{id}", aircraftHandler.GetAircraftByID)
+	mux.HandleFunc("PUT /aircrafts/{id}", aircraftHandler.UpdateAircraft)
+	mux.HandleFunc("DELETE /aircrafts/{id}", aircraftHandler.DeleteAircraft)
 
 	logger.Info("Server started on 3000")
 	err = http.ListenAndServe(":3000", mux)
