@@ -19,6 +19,7 @@ type AircraftRepositoryInterface interface {
 	GetByID(ctx context.Context, id int) (Aircraft, error)
 	Update(ctx context.Context, aircraft *Aircraft) (*Aircraft, error)
 	DeleteByID(ctx context.Context, id int) error
+	IsAvailable(ctx context.Context, aircraftID int, newDepartureAt time.Time, newArriveAt time.Time) (bool, error)
 }
 
 type Aircraft struct {
@@ -190,4 +191,19 @@ func (r *AircraftRepository) DeleteByID(ctx context.Context, id int) error {
 		return apperror.NotFound("Aircraft not found")
 	}
 	return nil
+}
+
+// False - busy
+// True  - free
+func (r *AircraftRepository) IsAvailable(ctx context.Context, aircraftID int, newDepartureAt time.Time, newArriveAt time.Time) (bool, error) {
+	query := "SELECT NOT EXISTS (SELECT 1 FROM flights WHERE aircraft_id = $1 AND departure_at < $2 AND arrive_at > $3)"
+
+	var available bool
+	err := r.db.QueryRow(ctx, query, aircraftID, newDepartureAt, newArriveAt).Scan(&available)
+	if err != nil {
+		logger.Warn(err)
+		return false, apperror.Internal("Internal Server Error", err)
+	}
+
+	return available, nil
 }

@@ -6,6 +6,7 @@ import (
 	apperror "MoodFly/pkg/error"
 	"MoodFly/pkg/logger"
 	"context"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -16,6 +17,7 @@ type AircraftServiceInterface interface {
 	GetByID(ctx context.Context, id int) (repository.Aircraft, error)
 	Update(ctx context.Context, id int, data *dto.UpdateAircraftDTO) (*repository.Aircraft, error)
 	Delete(ctx context.Context, id int) error
+	IsAvailable(ctx context.Context, aircraftID int, newDepartureAt time.Time, newArriveAt time.Time) (bool, error)
 }
 
 type AircraftService struct {
@@ -105,4 +107,8 @@ func (service *AircraftService) Update(ctx context.Context, id int, data *dto.Up
 
 func (service *AircraftService) Delete(ctx context.Context, id int) error {
 	return service.repository.DeleteByID(ctx, id)
+}
+
+func (service *AircraftService) IsAvailable(ctx context.Context, aircraftID int, newDepartureAt time.Time, newArriveAt time.Time) (bool, error) {
+	return service.repository.IsAvailable(ctx, aircraftID, newDepartureAt, newArriveAt)
 }
