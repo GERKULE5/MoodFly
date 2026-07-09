@@ -20,12 +20,12 @@ type UserRepositoryInterface interface {
 }
 
 type User struct {
-	ID          int
-	Username    string
-	Password    string
-	PhoneNumber string
-	CreatedAt   time.Time
-	DeletedAt   *time.Time
+	ID          int        `json:"id"`
+	Username    string     `json:"username"`
+	Password    string     `json:"password"`
+	PhoneNumber string     `json:"phone_number"`
+	CreatedAt   time.Time  `json:"created_at"`
+	DeletedAt   *time.Time `json:"deleted_at"`
 }
 
 type UserRepository struct {

@@ -23,14 +23,14 @@ type AircraftRepositoryInterface interface {
 }
 
 type Aircraft struct {
-	ID         int
-	WINNum     string
-	Model      string
-	Capacity   int
-	CarryingKg int
-	FlightTime int
-	ReleasedAt time.Time
-	LicensedAt time.Time
+	ID         int       `json:"id"`
+	WINNum     string    `json:"win_num"`
+	Model      string    `json:"model"`
+	Capacity   int       `json:"capacity"`
+	CarryingKg int       `json:"carrying_kg"`
+	FlightTime int       `json:"flight_time"`
+	ReleasedAt time.Time `json:"released_at"`
+	LicensedAt time.Time `json:"licensed_at"`
 }
 
 type AircraftRepository struct {

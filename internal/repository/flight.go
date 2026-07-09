@@ -20,12 +20,12 @@ type FlightRepositoryInterface interface {
 }
 
 type Flight struct {
-	ID          int
-	AircraftID  int
-	From        string
-	To          string
-	DepartureAt time.Time
-	ArriveAt    time.Time
+	ID          int       `json:"id"`
+	AircraftID  int       `json:"aircraft_id"`
+	From        string    `json:"from"`
+	To          string    `json:"to"`
+	DepartureAt time.Time `json:"departure_at"`
+	ArriveAt    time.Time `json:"arrive_at"`
 }
 
 type FlightRepository struct {
