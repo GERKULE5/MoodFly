@@ -63,9 +63,19 @@ func main() {
 	mux.HandleFunc("PUT /flights/{id}", flightHandler.UpdateFlight)
 	mux.HandleFunc("DELETE /flights/{id}", flightHandler.DeleteFlight)
 
-	logger.Info("Server started on 3000")
-	err = http.ListenAndServe(":3000", mux)
-	if err != nil {
+	logger.Info("Server started on 8080")
+
+	server := &http.Server{
+		Addr:              ":8080",
+		Handler:           mux,
+		ReadHeaderTimeout: 3 * time.Second,
+		ReadTimeout:       5 * time.Second,
+		WriteTimeout:      10 * time.Second,
+		IdleTimeout:       15 * time.Second,
+	}
+
+	err = server.ListenAndServe()
+	if err != nil && err != http.ErrServerClosed {
 		logger.Err("Server error: ", err)
 		return
 	}
