@@ -6,12 +6,20 @@ import (
 	"MoodFly/internal/service"
 	"MoodFly/pkg/database"
 	"MoodFly/pkg/logger"
+	"context"
 	"net/http"
+	"time"
 )
 
 func main() {
 	logger.Init()
-	db, err := database.ConnectDB()
+
+	ctx := context.Background()
+
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+
+	db, err := database.ConnectDB(ctx)
 	if err != nil {
 		logger.Err("Failed to connect DB")
 		return

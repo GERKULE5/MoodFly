@@ -18,7 +18,7 @@ type Config struct {
 	SSLMode  string
 }
 
-func ConnectDB() (*pgxpool.Pool, error) {
+func ConnectDB(ctx context.Context) (*pgxpool.Pool, error) {
 	config := Config{
 		Host:     getEnv("POSTGRES_HOST", "localhost"),
 		Port:     getEnv("POSTGRES_PORT", "5432"),
@@ -36,11 +36,13 @@ func ConnectDB() (*pgxpool.Pool, error) {
 	db, err := pgxpool.New(context.Background(), dsn)
 	if err != nil {
 		logger.Err("Failed connect to DB: ", err)
+		return nil, err
 	}
 
 	err = db.Ping(context.Background())
 	if err != nil {
 		logger.Err("Unable to Ping DB: ", err)
+		return nil, err
 	}
 
 	logger.Info("Successfully connected to DB")
