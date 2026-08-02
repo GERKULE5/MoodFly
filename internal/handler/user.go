@@ -18,7 +18,7 @@ func handleError(w http.ResponseWriter, err error) {
 	http.Error(w, msg, code)
 }
 
-func NewUserNandler(service service.UserServiceInterface) *UserHandler {
+func NewUserHandler(service service.UserServiceInterface) *UserHandler {
 	return &UserHandler{
 		service: service,
 	}
@@ -42,7 +42,6 @@ func (handler *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(user)
-
 }
 
 func (handler *UserHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {

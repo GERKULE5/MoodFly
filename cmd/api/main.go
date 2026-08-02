@@ -25,7 +25,7 @@ func main() {
 	// USERS
 	userRepo := repository.NewUserRepository(db)
 	userService := service.NewUserService(userRepo)
-	userHandler := handler.NewUserNandler(userService)
+	userHandler := handler.NewUserHandler(userService)
 
 	mux.HandleFunc("POST /users", userHandler.CreateUser)
 	mux.HandleFunc("GET /users", userHandler.GetAllUsers)

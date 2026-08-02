@@ -196,7 +196,7 @@ func (r *AircraftRepository) DeleteByID(ctx context.Context, id int) error {
 // False - busy
 // True  - free
 func (r *AircraftRepository) IsAvailable(ctx context.Context, aircraftID int, newDepartureAt time.Time, newArriveAt time.Time) (bool, error) {
-	query := "SELECT NOT EXISTS (SELECT 1 FROM flights WHERE aircraft_id = $1 AND departure_at < $2 AND arrive_at > $3)"
+	query := "SELECT NOT EXISTS (SELECT 1 FROM flights WHERE aircraft_id = $1 AND departure_at < $3 AND arrive_at > $2)"
 
 	var available bool
 	err := r.db.QueryRow(ctx, query, aircraftID, newDepartureAt, newArriveAt).Scan(&available)

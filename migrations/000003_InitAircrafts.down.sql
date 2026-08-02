@@ -1,1 +1,1 @@
-DELETE TABLE IF EXISTS aircrafts
+DROP TABLE IF EXISTS aircrafts

@@ -6,6 +6,7 @@ import (
 	apperror "MoodFly/pkg/error"
 	"MoodFly/pkg/logger"
 	"context"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -39,10 +40,19 @@ func (service *FlightService) Create(ctx context.Context, data *dto.CreateFlight
 		return nil, apperror.BadRequest("Bad request")
 	}
 
+	correctDate := checkDate(data.DepartureAt, data.ArriveAt)
+	if correctDate == false {
+		logger.Warn("Incorrect date")
+		return nil, apperror.BadRequest("Departure time must be before arrival time")
+	}
+
 	available, err := service.aircraftService.IsAvailable(ctx, data.AircraftID, data.DepartureAt, data.ArriveAt)
 
 	if available == false || err != nil {
-		logger.Warn(err)
+		if err != nil {
+			logger.Warn(err)
+		}
+		logger.Warn("Aircraft is busy")
 		return nil, apperror.Conflict("Aircraft is busy", err)
 	}
 
@@ -104,4 +114,12 @@ func (service *FlightService) Update(ctx context.Context, id int, data *dto.Upda
 
 func (service *FlightService) Delete(ctx context.Context, id int) error {
 	return service.repository.DeleteByID(ctx, id)
+}
+
+func checkDate(departureAt, arriveAt time.Time) bool {
+	if departureAt.After(arriveAt) || departureAt.Equal(arriveAt) {
+		return false
+	}
+
+	return true
 }
