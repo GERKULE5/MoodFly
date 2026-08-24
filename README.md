@@ -48,7 +48,7 @@ task dev
 
 ### Ping
 
-- GET ping/
+- GET /ping
 
 ### Users
 
