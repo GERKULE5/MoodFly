@@ -15,7 +15,8 @@ import (
 type UserServiceInterface interface {
 	Create(ctx context.Context, data *dto.CreateUserRequest) (*repository.User, error)
 	GetAll(ctx context.Context) ([]repository.User, error)
-	GetByID(ctx context.Context, id int) (repository.User, error)
+	GetByID(ctx context.Context, id int) (*repository.User, error)
+	GetByUsername(ctx context.Context, username string) (*repository.User, error)
 	Update(ctx context.Context, id int, data *dto.UpdateUserRequest) (*repository.User, error)
 	DeleteByID(ctx context.Context, id int) error
 }
@@ -57,8 +58,12 @@ func (s *UserService) GetAll(ctx context.Context) ([]repository.User, error) {
 	return s.repo.GetAll(ctx)
 }
 
-func (s *UserService) GetByID(ctx context.Context, id int) (repository.User, error) {
+func (s *UserService) GetByID(ctx context.Context, id int) (*repository.User, error) {
 	return s.repo.GetByID(ctx, id)
+}
+
+func (s *UserService) GetByUsername(ctx context.Context, username string) (*repository.User, error) {
+	return s.repo.GetByUsername(ctx, username)
 }
 
 func (s *UserService) Update(ctx context.Context, id int, data *dto.UpdateUserRequest) (*repository.User, error) {
@@ -89,7 +94,7 @@ func (s *UserService) Update(ctx context.Context, id int, data *dto.UpdateUserRe
 		existing.Password = string(hashed)
 	}
 
-	return s.repo.Update(ctx, &existing)
+	return s.repo.Update(ctx, existing)
 }
 
 func (s *UserService) DeleteByID(ctx context.Context, id int) error {

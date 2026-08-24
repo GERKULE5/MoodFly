@@ -14,7 +14,8 @@ import (
 type UserRepositoryInterface interface {
 	Create(ctx context.Context, user *User) (*User, error)
 	GetAll(ctx context.Context) ([]User, error)
-	GetByID(ctx context.Context, id int) (User, error)
+	GetByID(ctx context.Context, id int) (*User, error)
+	GetByUsername(ctx context.Context, username string) (*User, error)
 	Update(ctx context.Context, user *User) (*User, error)
 	DeleteByID(ctx context.Context, id int) error
 }
@@ -74,7 +75,7 @@ func (r *UserRepository) GetAll(ctx context.Context) ([]User, error) {
 	return users, nil
 }
 
-func (r *UserRepository) GetByID(ctx context.Context, id int) (User, error) {
+func (r *UserRepository) GetByID(ctx context.Context, id int) (*User, error) {
 	var user User
 
 	query := "SELECT id, username, password, phone_number, created_at, deleted_at FROM users WHERE id=$1"
@@ -90,12 +91,36 @@ func (r *UserRepository) GetByID(ctx context.Context, id int) (User, error) {
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			logger.Warn(err)
-			return User{}, apperror.NotFound("User not found")
+			return &User{}, apperror.NotFound("User not found")
 		}
 		logger.Warn(err)
-		return User{}, apperror.Internal("Internal Server Error", err)
+		return &User{}, apperror.Internal("Internal Server Error", err)
 	}
-	return user, nil
+	return &user, nil
+}
+
+func (r *UserRepository) GetByUsername(ctx context.Context, username string) (*User, error) {
+	var user User
+
+	query := "SELECT id, username, password, phone_number, created_at, deleted_at FROM users WHERE username=$1"
+
+	err := r.db.QueryRow(ctx, query, username).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Password,
+		&user.PhoneNumber,
+		&user.CreatedAt,
+		&user.DeletedAt,
+	)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			logger.Warn(err)
+			return &User{}, apperror.NotFound("User not found")
+		}
+		logger.Warn(err)
+		return &User{}, apperror.Internal("Internal Server Error", err)
+	}
+	return &user, nil
 }
 
 func (r *UserRepository) Update(ctx context.Context, user *User) (*User, error) {

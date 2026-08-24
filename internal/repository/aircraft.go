@@ -126,7 +126,7 @@ func (r *AircraftRepository) GetByID(ctx context.Context, id int) (Aircraft, err
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return Aircraft{}, apperror.NotFound("Not found aircrafts")
+			return Aircraft{}, apperror.NotFound("Aircraft not found")
 		}
 
 		return Aircraft{}, apperror.Internal("Internal server Error", err)

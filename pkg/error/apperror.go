@@ -45,6 +45,13 @@ func Conflict(message string, err error) *AppError {
 	}
 }
 
+func Unauthorized(message string) *AppError {
+	return &AppError{
+		Code:    http.StatusUnauthorized,
+		Message: message,
+	}
+}
+
 func ToHTTP(err error) (int, string) {
 	var appError *AppError
 	if errors.As(err, &appError) {

@@ -3,7 +3,6 @@ package handler
 import (
 	"MoodFly/internal/dto"
 	"MoodFly/internal/service"
-	apperror "MoodFly/pkg/error"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -11,11 +10,6 @@ import (
 
 type UserHandler struct {
 	service service.UserServiceInterface
-}
-
-func handleError(w http.ResponseWriter, err error) {
-	code, msg := apperror.ToHTTP(err)
-	http.Error(w, msg, code)
 }
 
 func NewUserHandler(service service.UserServiceInterface) *UserHandler {

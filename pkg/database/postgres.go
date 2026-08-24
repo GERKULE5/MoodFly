@@ -2,9 +2,9 @@ package database
 
 import (
 	"MoodFly/pkg/logger"
+	"MoodFly/pkg/utils"
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -20,12 +20,12 @@ type Config struct {
 
 func ConnectDB(ctx context.Context) (*pgxpool.Pool, error) {
 	config := Config{
-		Host:     getEnv("POSTGRES_HOST", "localhost"),
-		Port:     getEnv("POSTGRES_PORT", "5432"),
-		User:     getEnv("POSTGRES_USER", "postgres"),
-		Password: getEnv("POSTGRES_PASSWORD", "postgres"),
-		DBName:   getEnv("POSTGRES_DB", "crud_db"),
-		SSLMode:  getEnv("POSTGRES_SSLMODE", "disable"),
+		Host:     utils.GetEnv("POSTGRES_HOST", "localhost"),
+		Port:     utils.GetEnv("POSTGRES_PORT", "5432"),
+		User:     utils.GetEnv("POSTGRES_USER", "postgres"),
+		Password: utils.GetEnv("POSTGRES_PASSWORD", "postgres"),
+		DBName:   utils.GetEnv("POSTGRES_DB", "crud_db"),
+		SSLMode:  utils.GetEnv("POSTGRES_SSLMODE", "disable"),
 	}
 
 	dsn := fmt.Sprintf(
@@ -47,14 +47,4 @@ func ConnectDB(ctx context.Context) (*pgxpool.Pool, error) {
 
 	logger.Info("Successfully connected to DB")
 	return db, nil
-}
-
-func getEnv(key, defaultValue string) string {
-	value := os.Getenv(key)
-
-	if value != "" {
-		return value
-	}
-
-	return defaultValue
 }
