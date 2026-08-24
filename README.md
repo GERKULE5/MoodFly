@@ -25,7 +25,7 @@ git clone https://github.com/GERKULE5/MoodFly.git && cd MoodFly
 
 ### 2. Настройка окружения
 
-Переименнуйте .env.example -> .env
+Переименуйте .env.example -> .env
 
 ### 3. Установка зависимостей
 
@@ -45,6 +45,10 @@ task dev
 
 
 ## API
+
+### Ping
+
+- GET ping/
 
 ### Users
 
@@ -66,8 +70,8 @@ task dev
 - POST /aircrafts
 - GET /aircrafts
 - GET /aircrafts/{id}
-- PUT /aircrafts{id}
-- DELETE /aircrafts{id}
+- PUT /aircrafts/{id}
+- DELETE /aircrafts/{id}
 
 ### Flights
 
