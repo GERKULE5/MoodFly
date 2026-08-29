@@ -8,7 +8,6 @@ tasks:
   dev:
     desc: "Run application in development mode"
     cmds:
-      - task: docker:up
       - task: migrate:up
       - go run ./cmd/api/main.go
 
@@ -25,9 +24,7 @@ tasks:
   docker:up:
     desc: "Start Docker containers"
     cmds:
-      - docker-compose up -d
-      - echo "Waiting for database..."
-      - timeout 30s bash -c 'until docker exec database pg_isready -U {{.POSTGRES_USER}} -d {{.POSTGRES_DB}}; do sleep 1; done'
+      - docker compose up --wait --wait-timeout 10
 
   docker:down:
     desc: "Stop Docker containers"

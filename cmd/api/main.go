@@ -10,6 +10,9 @@ import (
 	"MoodFly/pkg/utils"
 	"context"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -24,9 +27,8 @@ func main() {
 	_ = godotenv.Load()
 	logger.Init()
 
-	ctx := context.Background()
-
-	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	// контекст для запуска зависимостей (бд, кэш)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	db, err := database.ConnectDB(ctx)
@@ -96,10 +98,8 @@ func main() {
 	mux.Handle("PUT /flights/{id}", protected(flightHandler.UpdateFlight))
 	mux.Handle("DELETE /flights/{id}", protected(flightHandler.DeleteFlight))
 
-	logger.Info("Server started on 8080")
-
 	server := &http.Server{
-		Addr:              ":8080",
+		Addr:              "127.0.0.1:8080",
 		Handler:           mux,
 		ReadHeaderTimeout: 3 * time.Second,
 		ReadTimeout:       5 * time.Second,
@@ -107,9 +107,42 @@ func main() {
 		IdleTimeout:       15 * time.Second,
 	}
 
-	err = server.ListenAndServe()
-	if err != nil && err != http.ErrServerClosed {
+	notifyCtx, stop := signal.NotifyContext(
+		context.Background(),
+		os.Interrupt,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+	)
+	defer stop()
+
+	errorsChan := make(chan error, 1)
+
+	go func() {
+		logger.Info("Starting server on 127.0.0.1:8080")
+		err := server.ListenAndServe()
+		if err != nil && err != http.ErrServerClosed {
+			errorsChan <- err
+		}
+	}()
+
+	select {
+	case <-notifyCtx.Done():
+		logger.Info("Received signal to shutdown")
+	case err := <-errorsChan:
 		logger.Err("Server error: ", err)
 		return
 	}
+
+	shutdownCtx, shutdownCancel := context.WithTimeout(
+		context.Background(),
+		10*time.Second,
+	)
+	defer shutdownCancel()
+
+	if err := server.Shutdown(shutdownCtx); err != nil {
+		logger.Err("Shutdown error: ", err)
+		return
+	}
+
+	logger.Info("Server stopped")
 }
