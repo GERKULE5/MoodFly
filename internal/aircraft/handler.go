@@ -1,8 +1,6 @@
-package handler
+package aircraft
 
 import (
-	"MoodFly/internal/dto"
-	"MoodFly/internal/service"
 	apperror "MoodFly/pkg/error"
 	"encoding/json"
 	"net/http"
@@ -10,27 +8,27 @@ import (
 )
 
 type AircraftHandler struct {
-	service service.AircraftServiceInterface
+	service AircraftServiceInterface
 }
 
-func NewAircraftHandler(service service.AircraftServiceInterface) *AircraftHandler {
+func NewAircraftHandler(service AircraftServiceInterface) *AircraftHandler {
 	return &AircraftHandler{
 		service: service,
 	}
 }
 
 func (handler *AircraftHandler) CreateAircraft(w http.ResponseWriter, r *http.Request) {
-	var aircraft dto.CreateAircraftDTO
+	var aircraft CreateAircraftDto
 
 	err := json.NewDecoder(r.Body).Decode(&aircraft)
 	if err != nil {
-		handleError(w, apperror.BadRequest("Bad Requestdf"))
+		apperror.HandleError(w, apperror.BadRequest("Bad Requestdf"))
 		return
 	}
 
 	result, err := handler.service.Create(r.Context(), &aircraft)
 	if err != nil {
-		handleError(w, err)
+		apperror.HandleError(w, err)
 		return
 	}
 
@@ -42,7 +40,7 @@ func (handler *AircraftHandler) CreateAircraft(w http.ResponseWriter, r *http.Re
 func (handler *AircraftHandler) GetAllAircrafts(w http.ResponseWriter, r *http.Request) {
 	aicrafts, err := handler.service.GetAll(r.Context())
 	if err != nil {
-		handleError(w, err)
+		apperror.HandleError(w, err)
 		return
 	}
 
@@ -54,13 +52,13 @@ func (handler *AircraftHandler) GetAllAircrafts(w http.ResponseWriter, r *http.R
 func (handler *AircraftHandler) GetAircraftByID(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
-		handleError(w, apperror.BadRequest("Invalid ID"))
+		apperror.HandleError(w, apperror.BadRequest("Invalid ID"))
 		return
 	}
 
 	aircraft, err := handler.service.GetByID(r.Context(), id)
 	if err != nil {
-		handleError(w, err)
+		apperror.HandleError(w, err)
 		return
 	}
 
@@ -72,21 +70,21 @@ func (handler *AircraftHandler) GetAircraftByID(w http.ResponseWriter, r *http.R
 func (handler *AircraftHandler) UpdateAircraft(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
-		handleError(w, apperror.BadRequest("Invalid ID"))
+		apperror.HandleError(w, apperror.BadRequest("Invalid ID"))
 		return
 	}
 
-	var aircraft dto.UpdateAircraftDTO
+	var aircraft UpdateAircraftDto
 
 	err = json.NewDecoder(r.Body).Decode(&aircraft)
 	if err != nil {
-		handleError(w, apperror.BadRequest("Bad Request"))
+		apperror.HandleError(w, apperror.BadRequest("Bad Request"))
 		return
 	}
 
 	result, err := handler.service.Update(r.Context(), id, &aircraft)
 	if err != nil {
-		handleError(w, err)
+		apperror.HandleError(w, err)
 		return
 	}
 
@@ -98,13 +96,13 @@ func (handler *AircraftHandler) UpdateAircraft(w http.ResponseWriter, r *http.Re
 func (handler *AircraftHandler) DeleteAircraft(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
-		handleError(w, apperror.BadRequest("Invalid ID"))
+		apperror.HandleError(w, apperror.BadRequest("Invalid ID"))
 		return
 	}
 
 	err = handler.service.Delete(r.Context(), id)
 	if err != nil {
-		handleError(w, err)
+		apperror.HandleError(w, err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

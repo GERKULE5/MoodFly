@@ -60,3 +60,8 @@ func ToHTTP(err error) (int, string) {
 
 	return http.StatusInternalServerError, "Internal Server Error"
 }
+
+func HandleError(w http.ResponseWriter, err error) {
+	code, msg := ToHTTP(err)
+	http.Error(w, msg, code)
+}

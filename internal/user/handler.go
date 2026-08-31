@@ -1,25 +1,24 @@
-package handler
+package user
 
 import (
-	"MoodFly/internal/dto"
-	"MoodFly/internal/service"
+	apperror "MoodFly/pkg/error"
 	"encoding/json"
 	"net/http"
 	"strconv"
 )
 
-type UserHandler struct {
-	service service.UserServiceInterface
+type Handler struct {
+	service *Service
 }
 
-func NewUserHandler(service service.UserServiceInterface) *UserHandler {
-	return &UserHandler{
+func NewHandler(service *Service) *Handler {
+	return &Handler{
 		service: service,
 	}
 }
 
-func (handler *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
-	var request dto.CreateUserRequest
+func (handler *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
+	var request CreateUserRequest
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -29,28 +28,35 @@ func (handler *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	user, err := handler.service.Create(r.Context(), &request)
 	if err != nil {
-		handleError(w, err)
+		apperror.HandleError(w, err)
 		return
 	}
 
+	response := NewResponse(user)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(user)
+	json.NewEncoder(w).Encode(response)
 }
 
-func (handler *UserHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
+func (handler *Handler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	users, err := handler.service.GetAll(r.Context())
 	if err != nil {
-		handleError(w, err)
+		apperror.HandleError(w, err)
 		return
+	}
+
+	response := make([]Response, 0, len(users))
+
+	for i := range users {
+		response = append(response, NewResponse(&users[i]))
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(users)
+	json.NewEncoder(w).Encode(response)
 }
 
-func (handler *UserHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
+func (handler *Handler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -60,16 +66,17 @@ func (handler *UserHandler) GetUserByID(w http.ResponseWriter, r *http.Request) 
 
 	user, err := handler.service.GetByID(r.Context(), id)
 	if err != nil {
-		handleError(w, err)
+		apperror.HandleError(w, err)
 		return
 	}
 
+	response := NewResponse(user)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(user)
+	json.NewEncoder(w).Encode(response)
 }
 
-func (handler *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
+func (handler *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -77,7 +84,7 @@ func (handler *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var request dto.UpdateUserRequest
+	var request UpdateUserRequest
 
 	err = json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -87,16 +94,17 @@ func (handler *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	user, err := handler.service.Update(r.Context(), id, &request)
 	if err != nil {
-		handleError(w, err)
+		apperror.HandleError(w, err)
 		return
 	}
 
+	response := NewResponse(user)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(user)
+	json.NewEncoder(w).Encode(response)
 }
 
-func (handler *UserHandler) DeleteUserByID(w http.ResponseWriter, r *http.Request) {
+func (handler *Handler) DeleteUserByID(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -106,7 +114,7 @@ func (handler *UserHandler) DeleteUserByID(w http.ResponseWriter, r *http.Reques
 
 	err = handler.service.DeleteByID(r.Context(), id)
 	if err != nil {
-		handleError(w, err)
+		apperror.HandleError(w, err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)

@@ -1,8 +1,6 @@
-package service
+package aircraft
 
 import (
-	"MoodFly/internal/dto"
-	"MoodFly/internal/repository"
 	apperror "MoodFly/pkg/error"
 	"MoodFly/pkg/logger"
 	"context"
@@ -12,34 +10,34 @@ import (
 )
 
 type AircraftServiceInterface interface {
-	Create(ctx context.Context, data *dto.CreateAircraftDTO) (*repository.Aircraft, error)
-	GetAll(ctx context.Context) ([]repository.Aircraft, error)
-	GetByID(ctx context.Context, id int) (repository.Aircraft, error)
-	Update(ctx context.Context, id int, data *dto.UpdateAircraftDTO) (*repository.Aircraft, error)
+	Create(ctx context.Context, data *CreateAircraftDto) (*Aircraft, error)
+	GetAll(ctx context.Context) ([]Aircraft, error)
+	GetByID(ctx context.Context, id int) (Aircraft, error)
+	Update(ctx context.Context, id int, data *UpdateAircraftDto) (*Aircraft, error)
 	Delete(ctx context.Context, id int) error
 	IsAvailable(ctx context.Context, aircraftID int, newDepartureAt time.Time, newArriveAt time.Time) (bool, error)
 }
 
 type AircraftService struct {
-	repository repository.AircraftRepositoryInterface
+	repository AircraftRepositoryInterface
 	validate   *validator.Validate
 }
 
-func NewAircraftService(repository repository.AircraftRepositoryInterface) AircraftServiceInterface {
+func NewAircraftService(repository AircraftRepositoryInterface) AircraftServiceInterface {
 	return &AircraftService{
 		repository: repository,
 		validate:   validator.New(),
 	}
 }
 
-func (service *AircraftService) Create(ctx context.Context, data *dto.CreateAircraftDTO) (*repository.Aircraft, error) {
+func (service *AircraftService) Create(ctx context.Context, data *CreateAircraftDto) (*Aircraft, error) {
 	err := service.validate.Struct(data)
 	if err != nil {
 		logger.Warn(err)
 		return nil, apperror.BadRequest("Bad request")
 	}
 
-	aircraft := &repository.Aircraft{
+	aircraft := &Aircraft{
 		WINNum:     data.WINNum,
 		Model:      data.Model,
 		Capacity:   data.Capacity,
@@ -52,15 +50,15 @@ func (service *AircraftService) Create(ctx context.Context, data *dto.CreateAirc
 	return service.repository.Create(ctx, aircraft)
 }
 
-func (service *AircraftService) GetAll(ctx context.Context) ([]repository.Aircraft, error) {
+func (service *AircraftService) GetAll(ctx context.Context) ([]Aircraft, error) {
 	return service.repository.GetAll(ctx)
 }
 
-func (service *AircraftService) GetByID(ctx context.Context, id int) (repository.Aircraft, error) {
+func (service *AircraftService) GetByID(ctx context.Context, id int) (Aircraft, error) {
 	return service.repository.GetByID(ctx, id)
 }
 
-func (service *AircraftService) Update(ctx context.Context, id int, data *dto.UpdateAircraftDTO) (*repository.Aircraft, error) {
+func (service *AircraftService) Update(ctx context.Context, id int, data *UpdateAircraftDto) (*Aircraft, error) {
 	err := service.validate.Struct(data)
 
 	if err != nil {

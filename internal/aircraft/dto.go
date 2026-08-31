@@ -1,8 +1,8 @@
-package dto
+package aircraft
 
 import "time"
 
-type CreateAircraftDTO struct {
+type CreateAircraftDto struct {
 	WINNum     string    `json:"win_num" validate:"required,min=12,max=12"`
 	Model      string    `json:"model" validate:"required,max=100"`
 	Capacity   int       `json:"capacity" validate:"required"`
@@ -12,7 +12,7 @@ type CreateAircraftDTO struct {
 	LicensedAt time.Time `json:"licensed_at" validate:"required"`
 }
 
-type UpdateAircraftDTO struct {
+type UpdateAircraftDto struct {
 	WINNum     *string    `json:"win_num" validate:"omitempty,min=12,max=12"`
 	Model      *string    `json:"model" validate:"omitempty,max=100"`
 	Capacity   *int       `json:"capacity" validate:"omitempty"`

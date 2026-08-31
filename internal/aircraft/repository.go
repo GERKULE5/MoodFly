@@ -1,4 +1,4 @@
-package repository
+package aircraft
 
 import (
 	apperror "MoodFly/pkg/error"
@@ -20,17 +20,6 @@ type AircraftRepositoryInterface interface {
 	Update(ctx context.Context, aircraft *Aircraft) (*Aircraft, error)
 	DeleteByID(ctx context.Context, id int) error
 	IsAvailable(ctx context.Context, aircraftID int, newDepartureAt time.Time, newArriveAt time.Time) (bool, error)
-}
-
-type Aircraft struct {
-	ID         int       `json:"id"`
-	WINNum     string    `json:"win_num"`
-	Model      string    `json:"model"`
-	Capacity   int       `json:"capacity"`
-	CarryingKg int       `json:"carrying_kg"`
-	FlightTime int       `json:"flight_time"`
-	ReleasedAt time.Time `json:"released_at"`
-	LicensedAt time.Time `json:"licensed_at"`
 }
 
 type AircraftRepository struct {
